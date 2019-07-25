@@ -11,12 +11,12 @@ class UdemySpider(scrapy.Spider):
     script = '''
 treat = require("treat")
 function main(splash, args)
-  splash:set_user_agent(args.user_agent)
+
   local entries = treat.as_array({})
     splash:on_request(function(request)
         table.insert(entries, request.info)
     end)
-  assert(splash:go(args.url))
+  assert(splash:go{args.url,headers=splash.args.headers})
   assert(splash:wait(1))
   return {
     entries =entries,
@@ -26,21 +26,14 @@ end
 
     def start_requests(self):
         url = f'{self.udmey_url}/courses/search/?src=ukw&q=python+flask'
-
-        yield SplashRequest(
-            url,
-            callback=self.parse_headers,
-            endpoint='execute',
-            args={
-                'wait':
-                2,
-                'lua_source':
-                self.script,
-                'user_agent':
-                ('Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36'
-                 ' (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'),
-            },
-            dont_filter=True)
+        yield SplashRequest(url,
+                            callback=self.parse_headers,
+                            endpoint='execute',
+                            args={
+                                'wait': 2,
+                                'lua_source': self.script,
+                            },
+                            dont_filter=True)
 
     def parse_headers(self, response):
         search_request = None
