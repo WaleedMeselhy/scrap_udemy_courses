@@ -6,26 +6,32 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.exceptions import NotConfigured
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
 import random, logging
 
 class UserAgentRotatorMiddleware(UserAgentMiddleware):
-    user_agents_list = [
-        'Mozilla/5.0 (Linux; Android 6.0.1; SM-G935S Build/MMB29K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/55.0.2883.91 Mobile Safari/537.36',
-        'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 6P Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.83 Mobile Safari/537.36',
-        'Mozilla/5.0 (Linux; Android 7.1.1; G8231 Build/41.2.A.0.219; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/59.0.3071.125 Mobile Safari/537.36',
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'
-    ]
+    
 
-    def __init__(self, user_agent=''):
-        self.user_agent = user_agent
+    def __init__(self, user_agents):
+        self.user_agents = user_agents
 
+    @classmethod
+    def from_crawler(cls, crawler):
+        user_agents = crawler.settings.get('USER_AGENT_CHOICES', [])
+
+        if not user_agents:
+            raise NotConfigured("USER_AGENT_CHOICES not set or empty")
+
+        o = cls(user_agents)
+        crawler.signals.connect(o.spider_opened, signal=signals.spider_opened)
+
+        return o
     def process_request(self, request, spider):
         try:
             logging.info('set user agent')
-            self.user_agent = random.choice(self.user_agents_list)
-            request.headers.setdefault('User-Agent', self.user_agent )
+            user_agent = random.choice(self.user_agents)
+            request.headers.setdefault('User-Agent', user_agent )
         except IndexError:
             logging.error('couldn\'t fetch user agent')
 
