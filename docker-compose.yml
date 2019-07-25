@@ -1,11 +1,13 @@
 version: '3.3'
 
 services:
-   goodreads:
+   udemy:
      image: scrap_udemy_courses
      build:
        context: .
        dockerfile: Dockerfile
+     environment:
+       - search_keyword=flask+python
      volumes:
        - ./output:/output/:rw
      depends_on:

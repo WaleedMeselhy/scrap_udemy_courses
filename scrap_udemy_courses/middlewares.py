@@ -15,6 +15,7 @@ class UserAgentRotatorMiddleware(UserAgentMiddleware):
 
     def __init__(self, user_agents):
         self.user_agents = user_agents
+        self.user_agent = ''
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -30,8 +31,8 @@ class UserAgentRotatorMiddleware(UserAgentMiddleware):
     def process_request(self, request, spider):
         try:
             logging.info('set user agent')
-            user_agent = random.choice(self.user_agents)
-            request.headers.setdefault('User-Agent', user_agent )
+            self.user_agent = random.choice(self.user_agents)
+            request.headers.setdefault('User-Agent', self.user_agent )
         except IndexError:
             logging.error('couldn\'t fetch user agent')
 

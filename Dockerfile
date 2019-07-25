@@ -25,7 +25,6 @@ RUN apk add libxslt
 COPY --from=builder /install /usr/local
 COPY scrap_udemy_courses /app/scrap_udemy_courses
 COPY scrapy.cfg /app/scrapy.cfg
-
 WORKDIR /app
-ENTRYPOINT [ "scrapy" ]
-CMD [ "crawl" , "udemy","-o","/output/courses.json"]
+ENTRYPOINT [ "sh" ]
+CMD [ "-c", "scrapy crawl udemy -a search_keyword=${search_keyword} -o/output/courses.json"]

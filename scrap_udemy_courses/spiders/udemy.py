@@ -8,6 +8,7 @@ class UdemySpider(scrapy.Spider):
     name = 'udemy'
     udmey_url = 'https://www.udemy.com'
     headers = None
+    search_keyword = ''
     script = '''
 treat = require("treat")
 function main(splash, args)
@@ -25,7 +26,8 @@ end
 '''
 
     def start_requests(self):
-        url = f'{self.udmey_url}/courses/search/?src=ukw&q=python+flask'
+        url = (f'{self.udmey_url}/courses/'
+               f'search/?src=ukw&q={self.search_keyword}')
         yield SplashRequest(url,
                             callback=self.parse_headers,
                             endpoint='execute',
@@ -67,10 +69,14 @@ end
                                  headers=self.headers)
 
     def parse_course(self, response):
-        data = json.loads(response.body)
+        data = json.loads(response.body)['curriculum']['data']
         yield {
             'course_name':
             response.meta['course_name'],
             'num_of_published_lectures':
-            data['curriculum']['data']['num_of_published_lectures']
+            data['num_of_published_lectures'],
+            'sections': [{
+                'title': section['title'],
+                'lecture_count': section['lecture_count']
+            } for section in data['sections']]
         }
