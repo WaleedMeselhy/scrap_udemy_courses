@@ -76,7 +76,13 @@ end
             'num_of_published_lectures':
             data['num_of_published_lectures'],
             'sections': [{
-                'title': section['title'],
-                'lecture_count': section['lecture_count']
+                'title':
+                section['title'],
+                'lecture_count':
+                section['lecture_count'],
+                'items': [{
+                    'title': item['title'],
+                    'content_summary': item['content_summary']
+                } for item in section['items']]
             } for section in data['sections']]
         }
