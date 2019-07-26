@@ -7,6 +7,7 @@ services:
        context: .
        dockerfile: Dockerfile
      environment:
+       - SPLASH_URL=http://splash:8050
        - search_keyword=flask+python
      volumes:
        - ./output:/output/:rw

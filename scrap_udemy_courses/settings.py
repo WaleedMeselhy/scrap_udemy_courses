@@ -1,3 +1,4 @@
+import os
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for scrap_udemy_courses project
@@ -91,8 +92,7 @@ DOWNLOADER_MIDDLEWARES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-# SPLASH_URL = 'http://localhost:8050'
-SPLASH_URL = 'http://splash:8050'
+SPLASH_URL = os.getenv('SPLASH_URL','http://localhost:8050')
 
 USER_AGENT_CHOICES = [
     'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0',
